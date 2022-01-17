@@ -1,17 +1,26 @@
-doctype html
-html(lang="en")
-    head
-        meta(charset="UTF-8")
-        meta(http-equiv="X-UA-Compatible", content="IE=edge")
-        meta(name="viewport", content="width=device-width, initial-scale=1.0")
-        title Shop
-        link(rel="stylesheet", href="/css/main.css")
-        link(rel="stylesheet", href="/css/products.css")
-    body 
-        header.main-header
-            nav.main-header_nav
-                ul.main-header_item-list 
-                    li.main-header_item 
-                        a.active(href="/") Shop
-                    li.main-header_item 
-                        a(href="/admin/add-product") 
+extends layouts/main-layout.pug
+
+block styles 
+    link(rel="stylesheet", href="/css/product.css")
+
+
+block content
+    main
+        if prods.length > 0
+                .grid
+                    each product in prods
+                        article.card.product_item
+                            header.card_header 
+                                h1.product_title #{product.title}
+                            .card_image 
+                                img(src="https://can.pixabay.com/photo/2016/03/31/20/51/book-1296045_960_720.png" alt="A Book")
+                            .card_content 
+                                h2.product_price $19.99
+                                p.product_description A very interesting book about so many even more interesting things! 
+                            .card_actions 
+                                button.btn Add to Cart 
+
+            else
+                h1 No Products
+
+        
