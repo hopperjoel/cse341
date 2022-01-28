@@ -2,10 +2,11 @@ const Product = require('../models/product');
 const Cart = require('../models/cart');
 
 exports.getProducts = (req, res, next) => {
-    Product.fetchAll(products => {
+    Product.fetchAll()
+        .then(products => {
     // const products = adminData.products
     // res.sendFile(path.join(rootDir, 'views', 'shop.html'))
-    res.render('shop/product-list', {
+            res.render('shop/product-list', {
                 prods: products, 
                 pageTitle: 'All Products', 
                 path: '/products'
@@ -24,15 +25,16 @@ exports.getProductById = (req, res, next) => {
 }
 
 exports.getIndex = (req, res, next) => {
-    Product.fetchAll(products => {
+    Product.fetchAll()
+    .then(products => {
         // const products = adminData.products
         // res.sendFile(path.join(rootDir, 'views', 'shop.html'))
         res.render('shop/index', {
-                    prods: products, 
-                    pageTitle: 'Shop', 
-                    path: '/'
-                });
+                prods: products, 
+                pageTitle: 'Shop', 
+                path: '/'
             });
+        });
 }
 
 exports.getCart = (req, res, next) => {
@@ -58,6 +60,24 @@ exports.getCart = (req, res, next) => {
 
 exports.postCart = (req, res, next) => {
     const productId = req.body.productId;
+    let fetchedCart;
+    let newQuantity = 1;
+    req.user
+        .getCart()
+        .then(cart => {
+            fetchedCart = cart;
+            return cart.getProducts({ where: {id: productId} });
+        })
+        .then(products => {
+            let product;
+            if (products.length > 0) {
+                product = products[0];
+            }
+            
+            if (product) {
+                const oldQuantity = product.cartItem.quantity;
+            }
+        })
     Product.findById(productId, (product) => {
         Cart.addProduct(productId, product.price);
     })

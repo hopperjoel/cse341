@@ -3,11 +3,11 @@ const http = require('http');
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
-//const expressHandle = require('express-handlebars');
-
+const PATH = process.env.port || 5000
+const errorController = require('./controllers/errors');
+const mongoConnect = require('./util/database').mongoConnect;
+const User = require('./models/user');
 const app = express();
-
-const errorController = require('./controllers/errors')
 
 //app.set('view engine', 'pug');
 //app.engine('handlebars', expressHandle());
@@ -18,16 +18,27 @@ app.set('views', 'views');
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({extended: false}));
 app.use(express.static(path.join(__dirname, 'public')))
 
-app.use('/admin', adminRoutes);
+app.use((req, res, next) => {
+    User.findById('61f36abb6a875526d3271358')
+      .then(user => {
+        req.user = user;
+        next();
+      })
+      .catch(err => console.log(err));
+});
 
+app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 
 app.use(errorController.get404)
 
-app.listen(4000);
+mongoConnect(client => {
+    app.listen(4000);
+})
+
 
 
 /*
