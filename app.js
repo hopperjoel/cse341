@@ -8,16 +8,16 @@ const PORT = process.env.port || 5000
 const errorController = require('./controllers/errors');
 //const mongoConnect = require('./util/database').mongoConnect;
 const User = require('./models/user');
-//const cors = require('cors');
+const cors = require('cors');
 
 const app = express();
 
-// const corsOptions = {
-//   origin: "https://cse341.herokuapp.com/",
-//     optionsSuccessStatus: 200
-// };
+const corsOptions = {
+  origin: "https://joel-hopper-cse-341.herokuapp.com/",
+    optionsSuccessStatus: 200
+};
 
-//app.use(cors(corsOptions));
+app.use(cors(corsOptions));
 
 const options = {
   useUnifiedTopology: true,
@@ -58,7 +58,7 @@ app.use(errorController.get404)
 
 mongoose
   .connect(
-    MONGODB_URL //options
+    MONGODB_URL, options
   )
    .then(result => {
     User.findOne()
