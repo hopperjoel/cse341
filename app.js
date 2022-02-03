@@ -4,6 +4,8 @@ const path = require("path");
 const mongoose = require("mongoose");
 const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
+const csrf = require('csurf');
+const flash = require('connect-flash');
 const PORT = process.env.port || 5000;
 
 const errorController = require("./controllers/errors");
@@ -18,6 +20,7 @@ const store = new MongoDBStore({
   uri: MONGODB_URI,
   collections: "sessions",
 });
+const csrfProtection = csrf()
 
 const corsOptions = {
   origin: "https://joel-hopper-cse-341.herokuapp.com/",
@@ -52,8 +55,13 @@ app.use(
     // can add cookie: options as well since this sets the cookie
   })
 );
+app.use(csrfProtection);
+app.use(flash());
 
 app.use((req, res, next) => {
+  if (!req.session.user) {
+    return next();
+  }
   User.findById(req.session.user._id)
   .then(user => {
     req.user = user
@@ -63,13 +71,19 @@ app.use((req, res, next) => {
 });
 
 app.use((req, res, next) => {
-  User.findById("61f59a417c527364988fc425")
-    .then((user) => {
-      req.user = user;
-      next();
-    })
-    .catch((err) => console.log(err));
-});
+  res.locals.isAuthenticated = req.session.isLoggedIn;
+  res.locals.csrfToken = req.csrfToken();
+  next();
+})
+
+// app.use((req, res, next) => {
+//   User.findById("61f59a417c527364988fc425")
+//     .then((user) => {
+//       req.user = user;
+//       next();
+//     })
+//     .catch((err) => console.log(err));
+// });
 
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
@@ -84,18 +98,18 @@ app.use(errorController.get404);
 mongoose
   .connect(MONGODB_URL, options)
   .then((result) => {
-    User.findOne().then((user) => {
-      if (!user) {
-        const user = new User({
-          name: "Max",
-          email: "max@test.com",
-          cart: {
-            items: [],
-          },
-        });
-        user.save();
-      }
-    });
+    // User.findOne().then((user) => {
+    //   if (!user) {
+    //     const user = new User({
+    //       name: "Max",
+    //       email: "max@test.com",
+    //       cart: {
+    //         items: [],
+    //       },
+    //     });
+    //     user.save();
+    //   }
+    // });
     app.listen(PORT);
   })
   .catch((err) => {
