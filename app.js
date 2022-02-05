@@ -20,14 +20,13 @@ const store = new MongoDBStore({
   uri: MONGODB_URI,
   collections: "sessions",
 });
+
 const csrfProtection = csrf()
 
 const corsOptions = {
   origin: "https://joel-hopper-cse-341.herokuapp.com/",
   optionsSuccessStatus: 200,
 };
-
-app.use(cors(corsOptions));
 
 const options = {
   useUnifiedTopology: true,
@@ -44,6 +43,7 @@ const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 const authRoutes = require("./routes/auth");
 
+app.use(cors(corsOptions));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(
