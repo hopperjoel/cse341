@@ -110,7 +110,7 @@ exports.postEditProduct = (req, res, next) => {
         title: updatedTitle,
         imageURL: updatedImageURL,
         price: updatedPrice,
-        description: updatedDescription,
+        description: updatedDesc,
         _id: productId
       },
       errorMessage: errors.array()[0].msg,
@@ -126,7 +126,7 @@ exports.postEditProduct = (req, res, next) => {
       product.title = updatedTitle;
       product.price = updatedPrice;
       product.imageURL = updatedImageURL;
-      product.Desc = updatedDesc;
+      product.description = updatedDesc;
       return product.save()
       .then((result) => {
         console.log("Updated Product");
